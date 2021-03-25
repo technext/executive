@@ -270,7 +270,13 @@ var navbarInit = function navbarInit() {
   var DataKey = {
     NAVBAR_ON_SCROLL: 'navbar-light-on-scroll'
   };
-  var navbar = document.querySelector(Selector.NAVBAR);
+  var navbar = document.querySelector(Selector.NAVBAR); // responsive nav collapsed
+
+  navbar.addEventListener('click', function (e) {
+    if (e.target.classList.contains('nav-link') && window.innerWidth < utils.getBreakpoint(navbar)) {
+      navbar.querySelector(Selector.NAVBAR_TOGGLER).click();
+    }
+  });
 
   if (navbar) {
     var windowHeight = window.innerHeight;
@@ -280,7 +286,7 @@ var navbarInit = function navbarInit() {
     var allColors = _objectSpread(_objectSpread({}, utils.colors), utils.grays);
 
     var name = utils.getData(navbar, DataKey.NAVBAR_ON_SCROLL);
-    var colorName = Object.keys(allColors).includes(name) ? name : 'light';
+    var colorName = Object.keys(allColors).includes(name) ? name : 'white';
     var color = allColors[colorName];
     var bgClassName = "bg-".concat(colorName);
     var shadowName = 'shadow-transition';
@@ -294,7 +300,8 @@ var navbarInit = function navbarInit() {
 
     window.addEventListener(Events.SCROLL, function () {
       var scrollTop = html.scrollTop;
-      var alpha = scrollTop / windowHeight * 0.5;
+      var alpha = scrollTop / windowHeight * 0.15; // Add class on scroll
+
       navbar.classList.add('backdrop');
 
       if (alpha === 0) {
@@ -338,6 +345,30 @@ var navbarInit = function navbarInit() {
       navbar.style.transition = 'none';
     });
   }
+};
+/* -------------------------------------------------------------------------- */
+
+/*                                Scroll To Top                               */
+
+/* -------------------------------------------------------------------------- */
+
+
+var scrollToTop = function scrollToTop() {
+  document.querySelectorAll('[data-anchor] > a, [data-scroll-to]').forEach(function (anchor) {
+    anchor.addEventListener('click', function (e) {
+      var _utils$getData;
+
+      e.preventDefault();
+      var el = e.target;
+      var id = utils.getData(el, 'scroll-to') || el.getAttribute('href');
+      window.scroll({
+        top: (_utils$getData = utils.getData(el, 'offset-top')) !== null && _utils$getData !== void 0 ? _utils$getData : utils.getOffset(document.querySelector(id)).top - 100,
+        left: 0,
+        behavior: 'smooth'
+      });
+      window.location.hash = id;
+    });
+  });
 }; // /* -------------------------------------------------------------------------- */
 // /*                            Theme Initialization                            */
 // /* -------------------------------------------------------------------------- */
@@ -345,4 +376,5 @@ var navbarInit = function navbarInit() {
 
 docReady(navbarInit);
 docReady(detectorInit);
+docReady(scrollToTop);
 //# sourceMappingURL=theme.js.map
